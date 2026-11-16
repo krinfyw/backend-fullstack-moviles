@@ -29,6 +29,9 @@ class SeguridadConfig {
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers(registro, login).permitAll()
+                        .requestMatchers(PathPatternRequestMatcher.withDefaults().matcher("/swagger-ui.html"),
+                        PathPatternRequestMatcher.withDefaults().matcher("/swagger-ui/**"),
+                        PathPatternRequestMatcher.withDefaults().matcher("/v3/api-docs/**")).permitAll()
                         .anyRequest().denyAll())
                 .build();
     }
