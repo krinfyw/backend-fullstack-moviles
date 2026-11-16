@@ -37,3 +37,6 @@ build/
 *:Zone.Identifier
 *.Zone.Identifier
 *Zone.Identifier
+
+# Config local con claves (NO subir)
+application-local.properties
