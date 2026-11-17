@@ -21,12 +21,17 @@ class SeguridadConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         var registro = PathPatternRequestMatcher.withDefaults()
                 .matcher(HttpMethod.POST, "/api/auth/register");
+        var login = PathPatternRequestMatcher.withDefaults()
+                .matcher(HttpMethod.POST, "/api/auth/login");
 
         return http
-                .csrf(csrf -> csrf.ignoringRequestMatchers(registro))
+                .csrf(csrf -> csrf.ignoringRequestMatchers(registro, login))
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
-                        .requestMatchers(registro).permitAll()
+                        .requestMatchers(registro, login).permitAll()
+                        .requestMatchers(PathPatternRequestMatcher.withDefaults().matcher("/swagger-ui.html"),
+                        PathPatternRequestMatcher.withDefaults().matcher("/swagger-ui/**"),
+                        PathPatternRequestMatcher.withDefaults().matcher("/v3/api-docs/**")).permitAll()
                         .anyRequest().denyAll())
                 .build();
     }
