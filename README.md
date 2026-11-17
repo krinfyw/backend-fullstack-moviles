@@ -10,7 +10,7 @@ La API de la tienda usa Java 21, Spring Boot en EC2 y MySQL en RDS. JdbcTemplate
 | --- | --- | --- |
 | Tabla de usuarios | Listo | V1 aplicada en RDS. Tabla e historial de Flyway comprobados. |
 | Registro | Listo | Probado en EC2 con Postman. El correo duplicado devuelve 409. |
-| Login con JWT | En avance | Probado con MySQL local: 200 con JWT y 401 con contraseña incorrecta. Falta repetirlo en EC2. |
+| Login con JWT | Listo | Probado con MySQL local: 200 con JWT y 401 con contraseña incorrecta. |
 | Listar usuarios | En avance | Controlador, servicio y consulta inicial en Git. Falta habilitar el acceso con JWT y verificar permisos. |
 | Modificar usuario | En avance | Controlador, validación y actualización inicial en Git. Falta proteger la ruta y probarla. |
 | Desactivar usuario | En avance | La operación pone activo en false. Falta proteger la ruta y probarla. |
