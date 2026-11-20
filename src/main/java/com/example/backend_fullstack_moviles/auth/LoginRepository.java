@@ -12,18 +12,20 @@ class LoginRepository {
         this.jdbc = jdbc;
     }
 
-    record Cuenta(long id, String passwordHash, boolean activo, String rol) {
+    record Cuenta(long id, String nombre, String passwordHash, boolean activo, String rol) {
     }
 
     Optional<Cuenta> buscarPorCorreo(String correo) {
         return jdbc.query("""
-                SELECT u.id, u.password_hash, u.activo, ua.rol
+                SELECT u.id, u.nombre, u.password_hash, u.activo, ua.rol
                 FROM usuario u
-                JOIN usuario_aplicacion ua ON ua.usuario_id = u.id AND ua.aplicacion = 'SONIDO_VIVO'
+                JOIN usuario_aplicacion ua
+                ON ua.usuario_id = u.id AND ua.aplicacion = 'SONIDO_VIVO'
                 WHERE u.correo = ?
                 """,
                 (rs, fila) -> new Cuenta(
                         rs.getLong("id"),
+                        rs.getString("nombre"),
                         rs.getString("password_hash"),
                         rs.getBoolean("activo"),
                         rs.getString("rol")),

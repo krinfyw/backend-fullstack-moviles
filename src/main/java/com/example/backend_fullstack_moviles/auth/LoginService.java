@@ -50,9 +50,9 @@ class LoginService {
                 .encode(JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(), claims))
                 .getTokenValue();
 
-        return new TokenRespuesta(token, vigencia.toSeconds(), cuenta.rol());
-    }
-
-    record TokenRespuesta(String token, long expiraEnSegundos, String rol) {
-    }
+        return new TokenRespuesta(cuenta.id(), cuenta.nombre(), cuenta.rol(), token, vigencia.toSeconds());
+        }
+        record TokenRespuesta(long id, String nombre, String rol, String token,
+        long expiraEnSegundos) {
+        }
 }
