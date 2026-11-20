@@ -16,7 +16,7 @@ class LoginController {
         this.service = service;
     }
 
-    @PostMapping("/api/auth/login")
+    @PostMapping("/api/v1/auth/login")
     LoginService.TokenRespuesta login(@Valid @RequestBody Solicitud solicitud) {
         return service.login(solicitud.correo(), solicitud.password());
     }
