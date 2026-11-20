@@ -9,6 +9,9 @@ import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 
 @Configuration
 class SeguridadConfig {
@@ -17,22 +20,33 @@ class SeguridadConfig {
         return new Argon2PasswordEncoder(16, 32, 1, 19456, 2);
     }
 
-    @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        var registro = PathPatternRequestMatcher.withDefaults()
-                .matcher(HttpMethod.POST, "/api/auth/register");
-        var login = PathPatternRequestMatcher.withDefaults()
-                .matcher(HttpMethod.POST, "/api/auth/login");
+@Bean
+SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    var rutas = PathPatternRequestMatcher.withDefaults();
+    var registro = rutas.matcher(HttpMethod.POST, "/api/v1/auth/register");
+    var login = rutas.matcher(HttpMethod.POST, "/api/v1/auth/login");
+    var listar = rutas.matcher(HttpMethod.GET, "/api/v1/usuarios");
+    var modificar = rutas.matcher(HttpMethod.PUT, "/api/v1/usuarios/{id}");
 
-        return http
-                .csrf(csrf -> csrf.ignoringRequestMatchers(registro, login))
-                .authorizeHttpRequests(auth -> auth
-                        .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
-                        .requestMatchers(registro, login).permitAll()
-                        .requestMatchers(PathPatternRequestMatcher.withDefaults().matcher("/swagger-ui.html"),
-                        PathPatternRequestMatcher.withDefaults().matcher("/swagger-ui/**"),
-                        PathPatternRequestMatcher.withDefaults().matcher("/v3/api-docs/**")).permitAll()
-                        .anyRequest().denyAll())
-                .build();
-    }
+    var roles = new JwtGrantedAuthoritiesConverter();
+    roles.setAuthoritiesClaimName("rol");
+    roles.setAuthorityPrefix("ROLE_");
+
+    var converter = new JwtAuthenticationConverter();
+    converter.setJwtGrantedAuthoritiesConverter(roles);
+
+    return http
+        .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .csrf(csrf -> csrf.ignoringRequestMatchers(registro, login, modificar))
+        .authorizeHttpRequests(auth -> auth
+        .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
+        .requestMatchers(registro, login).permitAll()
+        .requestMatchers(rutas.matcher("/swagger-ui.html"),
+                        rutas.matcher("/swagger-ui/**"),
+                        rutas.matcher("/v3/api-docs/**")).permitAll()
+        .requestMatchers(listar, modificar).hasRole("ADMIN")
+        .anyRequest().denyAll())
+        .oauth2ResourceServer(oauth2 ->
+        oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(converter)))
+        .build();}
 }
