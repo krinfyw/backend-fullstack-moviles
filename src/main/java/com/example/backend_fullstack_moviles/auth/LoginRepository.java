@@ -29,6 +29,6 @@ class LoginRepository {
                         rs.getString("password_hash"),
                         rs.getBoolean("activo"),
                         rs.getString("rol")),
-                correo).stream().findFirst();
+                aplicacion, correo).stream().findFirst();
     }
 }
