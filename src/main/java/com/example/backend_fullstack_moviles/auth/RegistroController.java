@@ -18,7 +18,7 @@ class RegistroController {
         this.service = service;
     }
 
-    @PostMapping("/api/auth/register")
+    @PostMapping("/api/v1/auth/register")
     @ResponseStatus(HttpStatus.CREATED)
     ClienteRegistrado registrar(@Valid @RequestBody Solicitud solicitud) {
         return service.registrar(solicitud.nombre(), solicitud.correo(), solicitud.password());
