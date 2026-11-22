@@ -31,10 +31,11 @@ class LoginService {
         this.vigencia = Duration.ofMinutes(minutos);
     }
 
-    TokenRespuesta login(String correo, String password) {
+    TokenRespuesta login(String correo, String password, String aplicacion) {
+        String app = aplicacion == null ? "SONIDO_VIVO": aplicacion;
         // 1. Buscar al usuario por correo y comprobar su contraseña contra el hash.
         //    Si algo falla (no existe, desactivado, clave mala) la respuesta es siempre la misma.
-        var cuenta = repository.buscarPorCorreo(correo.strip().toLowerCase(Locale.ROOT))
+        var cuenta = repository.buscarPorCorreo(correo.strip().toLowerCase(Locale.ROOT), app)
                 .filter(c -> c.activo() && passwordEncoder.matches(password, c.passwordHash()))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenciales inválidas."));
 
