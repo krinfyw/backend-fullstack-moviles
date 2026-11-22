@@ -14,7 +14,7 @@ class UsuarioRepository {
         return jdbc.query("""
                 SELECT u.id, u.nombre, u.correo, u.activo, ua.rol
                 FROM usuario u
-                LEFT JOIN usuario_aplicacion ua
+                JOIN usuario_aplicacion ua
                        ON ua.usuario_id = u.id AND ua.aplicacion = 'SONIDO_VIVO'
                 ORDER BY u.id
                 """,
@@ -26,7 +26,17 @@ class UsuarioRepository {
                         rs.getString("rol")));
     }
     int modificar(long id, String nombre, String correo) {
-        return jdbc.update("UPDATE usuario SET nombre = ?, correo = ? WHERE id = ?", nombre, correo, id);
+            return jdbc.update("""
+            UPDATE usuario u
+            SET nombre = ?, correo = ?
+            WHERE u.id = ?
+              AND EXISTS (
+                  SELECT 1
+                  FROM usuario_aplicacion ua
+                  WHERE ua.usuario_id = u.id
+                    AND ua.aplicacion = 'SONIDO_VIVO'
+              )
+            """, nombre, correo, id);
     }
     int desactivar(long id) {
         return jdbc.update("UPDATE usuario SET activo = FALSE WHERE id = ?", id);
