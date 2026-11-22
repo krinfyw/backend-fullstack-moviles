@@ -30,7 +30,7 @@ class SeguridadConfig {
             @Value("${app.cors.origen:http://localhost:5173}") String origen) {
         var cors = new CorsConfiguration();
         cors.setAllowedOrigins(List.of(origen));
-        cors.setAllowedMethods(List.of("GET", "POST", "PUT", "OPTIONS"));
+        cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         cors.setAllowedHeaders(List.of("Content-Type", "Authorization"));
 
         var source = new UrlBasedCorsConfigurationSource();
@@ -45,6 +45,7 @@ class SeguridadConfig {
         var login = rutas.matcher(HttpMethod.POST, "/api/v1/auth/login");
         var listar = rutas.matcher(HttpMethod.GET, "/api/v1/usuarios");
         var modificar = rutas.matcher(HttpMethod.PUT, "/api/v1/usuarios/{id}");
+        var desactivar = rutas.matcher(HttpMethod.DELETE, "/api/v1/usuarios/{id}");
 
         var roles = new JwtGrantedAuthoritiesConverter();
         roles.setAuthoritiesClaimName("rol");
@@ -56,7 +57,7 @@ class SeguridadConfig {
         return http
                 .cors(Customizer.withDefaults())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .csrf(csrf -> csrf.ignoringRequestMatchers(registro, login, modificar))
+                .csrf(csrf -> csrf.ignoringRequestMatchers(registro, login, modificar, desactivar))
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers(registro, login).permitAll()
@@ -64,7 +65,7 @@ class SeguridadConfig {
                                 rutas.matcher("/swagger-ui.html"),
                                 rutas.matcher("/swagger-ui/**"),
                                 rutas.matcher("/v3/api-docs/**")).permitAll()
-                        .requestMatchers(listar, modificar).hasRole("ADMIN")
+                        .requestMatchers(listar, modificar, desactivar).hasRole("ADMIN")
                         .anyRequest().denyAll())
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(converter)))

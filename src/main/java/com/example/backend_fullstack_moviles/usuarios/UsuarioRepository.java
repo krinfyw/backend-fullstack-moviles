@@ -39,6 +39,16 @@ class UsuarioRepository {
             """, nombre, correo, id);
     }
     int desactivar(long id) {
-        return jdbc.update("UPDATE usuario SET activo = FALSE WHERE id = ?", id);
+        return jdbc.update("""
+                UPDATE usuario u
+                SET activo = FALSE
+                WHERE u.id = ?
+                  AND EXISTS (
+                      SELECT 1
+                      FROM usuario_aplicacion ua
+                      WHERE ua.usuario_id = u.id
+                        AND ua.aplicacion = 'SONIDO_VIVO'
+                  )
+                """, id);
     }
 }
