@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,11 +19,12 @@ class LoginController {
 
     @PostMapping("/api/v1/auth/login")
     LoginService.TokenRespuesta login(@Valid @RequestBody Solicitud solicitud) {
-        return service.login(solicitud.correo(), solicitud.password());
+        return service.login(solicitud.correo(), solicitud.password(), solicitud.aplicacion());
     }
 
     record Solicitud(
             @NotBlank @Email @Size(max = 150) String correo,
-            @NotBlank @Size(max = 128) String password) {
+            @NotBlank @Size(max = 128) String password,
+            @Pattern(regexp = "SONIDO_VIVO|MOVIL") String aplicacion) {
     }
 }
