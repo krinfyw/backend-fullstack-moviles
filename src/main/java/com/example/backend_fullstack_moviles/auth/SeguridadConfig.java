@@ -43,7 +43,8 @@ class SeguridadConfig {
         var rutas = PathPatternRequestMatcher.withDefaults();
         var registro = rutas.matcher(HttpMethod.POST, "/api/v1/auth/register");
         var login = rutas.matcher(HttpMethod.POST, "/api/v1/auth/login");
-        var listar = rutas.matcher(HttpMethod.GET, "/api/v1/usuarios");
+        var sesion = rutas.matcher(HttpMethod.GET, "/api/v1/auth/sesion");
+        var listar =rutas.matcher(HttpMethod.GET, "/api/v1/usuarios");
         var modificar = rutas.matcher(HttpMethod.PUT, "/api/v1/usuarios/{id}");
         var desactivar = rutas.matcher(HttpMethod.DELETE, "/api/v1/usuarios/{id}");
 
@@ -65,7 +66,8 @@ class SeguridadConfig {
                                 rutas.matcher("/swagger-ui.html"),
                                 rutas.matcher("/swagger-ui/**"),
                                 rutas.matcher("/v3/api-docs/**")).permitAll()
-                        .requestMatchers(listar, modificar, desactivar).hasRole("ADMIN")
+                        .requestMatchers(sesion).authenticated()
+                        .requestMatchers(listar,modificar, desactivar).hasRole("ADMIN")
                         .anyRequest().denyAll())
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(converter)))
